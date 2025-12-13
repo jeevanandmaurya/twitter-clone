@@ -1,0 +1,32 @@
+
+
+.item {
+   display: flex;
+   padding: 10px;
+   border-radius: 60px;
+}
+.item:hover,h2:hover {
+   background-color: rgba(49, 49, 49,0.49);
+   cursor: pointer;
+}
+
+.main {
+   width: 100%;
+   height: 100%;
+   padding: 16px;
+   gap: 8px;
+}
+.leftPanel {
+   display: flex;
+   flex-direction: column;
+   width: 25%;
+}
+.mainContent {
+   width: 50%;
+}
+
+.rightPanel {
+   display: flex;
+   flex-direction: column;
+   width: 25%;
+}
