@@ -49,7 +49,7 @@ export default function RootLayout({
       </div>
       <div className="flex flex-col w-1/2 h-full border-r-[1px] border-[rgba(105,105,105,0.49)]">{children}</div>
 
-      <div id="rightPanel" className="flex flex-col h-full p-[16px] border-r-[1px] border-[rgba(105,105,105,0.49)]">
+      <div id="rightPanel" className="flex flex-col w-1/4 h-full p-[16px] border-r-[1px] border-[rgba(105,105,105,0.49)]">
         <div className="trending">Trending</div>
         <div className="recommended">Recommended</div>
         <div className="follow">Follow</div>
