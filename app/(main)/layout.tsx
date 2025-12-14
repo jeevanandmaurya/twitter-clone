@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import styles from "./main.module.css";
 
@@ -7,8 +8,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className={`flex w-full h-full gap-[8px]`}>
-      <div id="leftPanel" className="flex flex-col w-1/4 h-full p-[16px] border-r-[1px] border-[rgba(105,105,105,0.49)]">
+    <div className={`flex w-full h-full`}>
+      <div
+        id="leftPanel"
+        className={`${styles.leftPanel} flex flex-col w-1/4 h-full p-[16px] border-r-[1px] border-[rgba(105,105,105,0.49)]`}
+      >
         <div className="menuItem">
           <Link href="/home">
             <div id="home" className={styles.item}>
@@ -47,9 +51,16 @@ export default function RootLayout({
           </Link>
         </div>
       </div>
-      <div className="flex flex-col w-1/2 h-full border-r-[1px] border-[rgba(105,105,105,0.49)]">{children}</div>
+      <div
+        className={`${styles.mainContent} flex flex-col w-1/2 h-full border-r-[1px] border-[rgba(105,105,105,0.49)]`}
+      >
+        {children}
+      </div>
 
-      <div id="rightPanel" className="flex flex-col w-1/4 h-full p-[16px] border-r-[1px] border-[rgba(105,105,105,0.49)]">
+      <div
+        id="rightPanel"
+        className={`${styles.rightPanel} flex flex-col w-1/4 h-full p-[16px] border-r-[1px] border-[rgba(105,105,105,0.49)]`}
+      >
         <div className="trending">Trending</div>
         <div className="recommended">Recommended</div>
         <div className="follow">Follow</div>

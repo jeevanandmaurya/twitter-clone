@@ -12,6 +12,7 @@ export function proxy(request: NextRequest) {
   const isLoginPage = request.nextUrl.pathname.startsWith('/login');
   const isRoot = request.nextUrl.pathname === '/';  
   const isSignupPage = request.nextUrl.pathname.startsWith('/signup');
+  const isProfilePage = request.nextUrl.pathname.startsWith('/profile');
 
   if (isSignupPage) {
     return NextResponse.next();
@@ -25,6 +26,10 @@ export function proxy(request: NextRequest) {
   // Scenario B: User IS logged in, but trying to see the login page
   if (hasAuth && (isRoot)) {
     return NextResponse.redirect(new URL('/home', request.url));
+  }
+  if (hasAuth && isProfilePage) {
+    console.log('Redirecting profile to username');
+    return NextResponse.redirect(new URL('/jeevanand', request.url));
   }
 
   // 3. Allow everything else

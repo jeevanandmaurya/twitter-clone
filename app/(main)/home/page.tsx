@@ -1,27 +1,8 @@
-import Link from "next/link";
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
+import TweetCard from "./tweetCard";
 import { createClient } from "@/lib/supabase/server";
 
-import TweetCard from "./tweetCard";
-
-// async function Todos() {
-//   const supabase = await createClient();
-
-//   const { data: todos, error } = await supabase.from("todos").select("name");
-
-//   console.log("Todos data:", todos);
-//   if (error) console.error("Todos error:", error);
-
-//   return todos ? (
-//     <ol>
-//       {todos.map((todo, index) => (
-//         <li key={index}>{todo.name}</li>
-//       ))}
-//     </ol>
-//   ) : (
-//     <p>No todos found.</p>
-//   );
-// }
 
 type Tweet = {
   tweet_id: number;
@@ -33,7 +14,16 @@ type Tweet = {
   };
 };
 
-async function Tweets() {
+
+type TweetPost = {
+  tweet_id: number;
+  user_id: string;
+  content: string;
+  created_at: string;
+};
+
+async function LoadTweets() {
+  
   const supabase = await createClient();
 
   const { data: tweets, error } = await supabase
@@ -69,38 +59,71 @@ async function Tweets() {
   );
 }
 
+async function postTweet(formData: FormData) {
+  "use server";
+
+  const supabase = await createClient();
+
+  const content = formData.get("content") as string;
+  if (!content?.trim()) return;
+
+  const result = await supabase.from("tweets").insert([
+    {
+      user_id: "deff5f06-1844-44e8-b5b0-569eb9657604",
+      content: content,
+    },
+  ]);
+  console.log("Tweet post status", result);
+  if (result.error) {
+    console.error("Error posting tweet:", result.error);
+  } else {
+    console.log("Tweet posted successfully:", result.data);
+    revalidatePath("/home"); // Refresh the page to show new tweet
+  }
+}
+
 export default function HomePage() {
   console.log("Rendering HomePage"); // Log when HomePage is rendered
 
   return (
     <div className="tabs relative boxsizing-border flex flex-col h-full">
-      <div className="p-2 fixed top-0 left-1/4 w-1/2 h-10 bg-[rgba(0,0,0,0.8)] backdrop-blur-sm ">
-      <h2 className="border-b w-max border-blue-600">Following</h2></div>
-      <div className="following scrollable-y overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-200">
-        <div className="postTweet mt-10 flex gap-3 p-3 border-b border-gray-700">
-          <div className="avatar w-10 h-10 p-1 rounded-full mt-1 p-1 align-center flex justify-center items-center bg-gray-200 text-gray-500 border-gray-400">J</div>
-          <div className="input flex-1 ">
-            <textarea
-              className="w-full p-2 border border-gray-300 rounded-md resize-none"
-              placeholder="What's happening?"
-              rows={3}
-            ></textarea>
-            <div className="actions flex justify-end mt-2">
-              <button className="post-button bg-blue-500 text-white px-4 py-1 rounded-full hover:bg-blue-600">
-                Post
-              </button>
+      <div className="fixed top-0 left-1/4 w-1/2 h-15 bg-[rgba(0,0,0,0.8)] backdrop-blur-sm ">
+
+        <h4 className="m-2 relative border-b-5 rounded w-max border-blue-600">Following</h4>
+
+      </div>
+        <div className="following h-full overflow-y-auto ">
+          <div className="postTweet mt-15  flex gap-3 p-3 border-b border-gray-700">
+            <div className="avatar w-10 h-10 p-1 rounded-full mt-1 p-1 align-center flex justify-center items-center bg-gray-200 text-gray-500 border-gray-400">
+              J
             </div>
+
+            <form action={postTweet} className="flex-1">
+              <div className="flex flex-col w-full">
+                <textarea
+                  name="content"
+                  id="postTweetContent"
+                  className="w-full p-2 focus:border focus:row-3 border-gray-300 rounded-md resize-none"
+                  placeholder="What's happening?"
+                  maxLength={280}
+                ></textarea>
+              </div>
+
+              <div className="actions flex justify-end mt-2">
+                <button
+                  type="submit"
+                  className="post-button text-sm  font-semibold bg-blue-500 text-white px-4 py-1 rounded-full hover:bg-blue-600 cursor-pointer"
+                >
+                  Post
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div className="tweets">
+            <LoadTweets />
           </div>
         </div>
-        <div className="tweets max-h-96">
-          <Tweets />
-        </div>
-        <br />
-        {/* <div className="todos">
-          <p>Here is a list of todos from supabase:</p>
-          <Todos />
-        </div> */}
       </div>
-    </div>
   );
 }

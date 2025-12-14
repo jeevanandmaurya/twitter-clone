@@ -20,13 +20,13 @@
    display: flex;
    flex-direction: column;
    width: 25%;
+   font-size: larger;
 }
 .mainContent {
-   width: 50%;
+   font-weight: 300;
+   font-size: larger;
 }
 
 .rightPanel {
-   display: flex;
-   flex-direction: column;
-   width: 25%;
+   font-size: larger;
 }
