@@ -61,7 +61,7 @@ async function Tweets() {
   return tweets ? (
     <div>
       {tweets.map((tweet) => (
-        <TweetCard key={tweet.tweet_id} tweet={tweet} />
+        <TweetCard key={tweet.tweet_id} tweet={tweet as unknown as Tweet} />
       ))}
     </div>
   ) : (
