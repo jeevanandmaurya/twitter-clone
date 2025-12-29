@@ -1,48 +1,60 @@
-
 "use client";
 
+import { signInUser } from "@/lib/supabase/server";
 import { useRouter } from "next/navigation";
 
 export default function AuthPage() {
-  const router = useRouter();
+  const router = useRouter(); // ✅ Call hook at top level
 
   function signup() {
-    console.log("Signing up");
     router.push("/signup");
-    router.refresh();
   }
 
   function login() {
-    console.log("Logging in");
-    document.cookie = "fake-auth-token=true; path=/; max-age=3600";
-    router.push("/home");
-    router.refresh();
-  }
-
-  function logout() {
-    console.log("Logging out");
-    document.cookie = "fake-auth-token=false; path=/; max-age=0";
-    router.push("/");
-    router.refresh();
+    console.log("Logging in...");
+    const form = document.querySelector("form");
+    if (form) {
+      const formData = new FormData(form);
+      signInUser(formData).then((result) => {
+        console.log(result);
+        if (!result.error) {
+          alert("Login successful!");
+          router.push("/");
+        } else {
+          alert("Login failed: " + result.error?.message);
+        }
+      });
+    }
   }
 
   return (
-    <div className="flex w-full items-center justify-center m-auto h-full gap-4">
+    <div className="flex flex-col w-full items-center justify-center m-auto h-full gap-4">
       <h1 className="text-2xl font-bold">Authentication</h1>
-      <div className="flex gap-4">
-        <button onClick={signup}>Create Account</button>
+
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
+          <form className="flex flex-col gap-4">
+            <input type="email" placeholder="Email" name="email" />
+            <input type="password" placeholder="Password" name="password" />
+            {/* <input type="text" placeholder="Username" name="username" /> */}
+            {/* <input type="date" placeholder="Date of Birth" name="dob" /> */}
+          </form>
+
+          <button
+            onClick={login}
+            className="p-1 cursor-pointer bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Login
+          </button>
+        </div>
         <button
-          onClick={login}
-          className="px-4 py-2 cursor-pointer bg-blue-500 text-white rounded hover:bg-blue-600"
+          onClick={signup}
+          className="p-1 cursor-pointer bg-gray-900 rounded hover:bg-blue-400"
         >
-          Login
+          Create Account
         </button>
-        <button
-          onClick={logout}
-          className="px-4 py-2 cursor-pointer bg-red-500 text-white rounded hover:bg-red-600"
-        >
-          Logout
-        </button>
+        <br />
+        <br />
       </div>
     </div>
   );

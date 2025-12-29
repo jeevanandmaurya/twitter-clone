@@ -1,30 +1,32 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import {getCurrentUser} from '@/lib/supabase/server';
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
 
   console.log('Proxy middleware executed at URL:', request.nextUrl.pathname);
 
-  // 1. Check for your auth token (cookie)
-  const hasAuth = request.cookies.has('fake-auth-token');
-  
-  // 2. Determine where the user is trying to go
-  const isLoginPage = request.nextUrl.pathname.startsWith('/login');
+  const currentUser = await getCurrentUser();
+  const hasAuth = currentUser ? true : false;
+
+  console.log('User authenticated:', hasAuth);
+  if (hasAuth) {
+    console.log('Current Email:', currentUser?.email);
+  }
+ 
   const isRoot = request.nextUrl.pathname === '/';  
-  const isSignupPage = request.nextUrl.pathname.startsWith('/signup');
+  const isSignUpPage = request.nextUrl.pathname === '/signup';
+  const isLoginPage = request.nextUrl.pathname.startsWith('/login');
   const isProfilePage = request.nextUrl.pathname.startsWith('/profile');
 
-  if (isSignupPage) {
-    return NextResponse.next();
+  if (!hasAuth && isSignUpPage) {
+    return NextResponse.redirect(new URL('/signup', request.url));
   }
 
-  // Scenario A: User is NOT logged in, but trying to see the dashboard
   if (!hasAuth && !isLoginPage) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
-
-  // Scenario B: User IS logged in, but trying to see the login page
-  if (hasAuth && (isRoot)) {
+  if (hasAuth && (isLoginPage || isSignUpPage || isRoot)) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
   if (hasAuth && isProfilePage) {
@@ -32,11 +34,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/jeevanand', request.url));
   }
 
-  // 3. Allow everything else
   return NextResponse.next();
 }
 
-// Configuration to prevent the proxy from running on images/static files
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };

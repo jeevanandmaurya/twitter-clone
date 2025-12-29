@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+
 import { revalidatePath } from "next/cache";
 import TweetCard from "./tweetCard";
 import { createClient } from "@/lib/supabase/server";
